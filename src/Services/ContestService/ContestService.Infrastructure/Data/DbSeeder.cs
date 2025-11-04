@@ -66,8 +66,8 @@ public static class DbSeeder
             PreviousStageId = null,
             Name = "Registration Phase",
             Description = "Participants register for the competition and submit required documentation.",
-            DateStart = new DateTime(2024, 1, 1, 9, 0, 0),
-            DateEnd = new DateTime(2024, 1, 31, 23, 59, 59)
+            DateStart = new DateTime(2024, 1, 1, 9, 0, 0, DateTimeKind.Utc),
+            DateEnd = new DateTime(2024, 1, 31, 23, 59, 59, DateTimeKind.Utc)
         };
         context.EventStages.Add(registrationStage);
         context.SaveChanges();
@@ -78,8 +78,8 @@ public static class DbSeeder
             PreviousStageId = registrationStage.Id,
             Name = "Qualification Round",
             Description = "Online qualification round with algorithmic challenges. Top performers advance to the next stage.",
-            DateStart = new DateTime(2024, 2, 5, 10, 0, 0),
-            DateEnd = new DateTime(2024, 2, 5, 18, 0, 0)
+            DateStart = new DateTime(2024, 2, 5, 10, 0, 0, DateTimeKind.Utc),
+            DateEnd = new DateTime(2024, 2, 5, 18, 0, 0, DateTimeKind.Utc)
         };
         context.EventStages.Add(qualificationStage);
         context.SaveChanges();
@@ -90,8 +90,8 @@ public static class DbSeeder
             PreviousStageId = qualificationStage.Id,
             Name = "Semi-Final Round",
             Description = "Regional semi-final competition held at multiple locations. Winners proceed to the grand finale.",
-            DateStart = new DateTime(2024, 3, 15, 9, 0, 0),
-            DateEnd = new DateTime(2024, 3, 15, 17, 0, 0)
+            DateStart = new DateTime(2024, 3, 15, 9, 0, 0, DateTimeKind.Utc),
+            DateEnd = new DateTime(2024, 3, 15, 17, 0, 0, DateTimeKind.Utc)
         };
         context.EventStages.Add(semiFinalStage);
         context.SaveChanges();
@@ -102,8 +102,8 @@ public static class DbSeeder
             PreviousStageId = semiFinalStage.Id,
             Name = "Grand Finale",
             Description = "The ultimate competition round where finalists compete for the championship title and prizes.",
-            DateStart = new DateTime(2024, 4, 20, 9, 0, 0),
-            DateEnd = new DateTime(2024, 4, 20, 18, 0, 0)
+            DateStart = new DateTime(2024, 4, 20, 9, 0, 0, DateTimeKind.Utc),
+            DateEnd = new DateTime(2024, 4, 20, 18, 0, 0, DateTimeKind.Utc)
         };
         context.EventStages.Add(finalStage);
         context.SaveChanges();
@@ -115,8 +115,8 @@ public static class DbSeeder
             PreviousStageId = null,
             Name = "Team Registration",
             Description = "Teams of 2-4 members register for the hackathon.",
-            DateStart = new DateTime(2024, 5, 1, 0, 0, 0),
-            DateEnd = new DateTime(2024, 5, 15, 23, 59, 59)
+            DateStart = new DateTime(2024, 5, 1, 0, 0, 0, DateTimeKind.Utc),
+            DateEnd = new DateTime(2024, 5, 15, 23, 59, 59, DateTimeKind.Utc)
         };
         context.EventStages.Add(hackathonRegistration);
         context.SaveChanges();
@@ -127,8 +127,8 @@ public static class DbSeeder
             PreviousStageId = hackathonRegistration.Id,
             Name = "Hackathon Development",
             Description = "48-hour intensive development phase where teams build their solutions.",
-            DateStart = new DateTime(2024, 6, 1, 9, 0, 0),
-            DateEnd = new DateTime(2024, 6, 3, 9, 0, 0)
+            DateStart = new DateTime(2024, 6, 1, 9, 0, 0, DateTimeKind.Utc),
+            DateEnd = new DateTime(2024, 6, 3, 9, 0, 0, DateTimeKind.Utc)
         };
         context.EventStages.Add(hackathonMain);
         context.SaveChanges();
@@ -139,8 +139,8 @@ public static class DbSeeder
             PreviousStageId = hackathonMain.Id,
             Name = "Project Presentation",
             Description = "Teams present their solutions to judges and compete for awards.",
-            DateStart = new DateTime(2024, 6, 3, 10, 0, 0),
-            DateEnd = new DateTime(2024, 6, 3, 16, 0, 0)
+            DateStart = new DateTime(2024, 6, 3, 10, 0, 0, DateTimeKind.Utc),
+            DateEnd = new DateTime(2024, 6, 3, 16, 0, 0, DateTimeKind.Utc)
         };
         context.EventStages.Add(hackathonPresentation);
         context.SaveChanges();
@@ -170,7 +170,7 @@ public static class DbSeeder
             Description = "Correctness of solutions submitted for algorithmic problems.",
             IsRequired = true,
             MinimumThresholdScore = 70.00m,
-            IsActiveUntil = new DateTime(2024, 2, 5, 18, 0, 0)
+            IsActiveUntil = new DateTime(2024, 2, 5, 18, 0, 0, DateTimeKind.Utc)
         };
 
         var criteria2 = new EventStageCriteria
@@ -180,7 +180,7 @@ public static class DbSeeder
             Description = "Evaluation of code readability, efficiency, and best practices.",
             IsRequired = false,
             MinimumThresholdScore = 60.00m,
-            IsActiveUntil = new DateTime(2024, 2, 5, 18, 0, 0)
+            IsActiveUntil = new DateTime(2024, 2, 5, 18, 0, 0, DateTimeKind.Utc)
         };
 
         var criteria3 = new EventStageCriteria
@@ -190,7 +190,7 @@ public static class DbSeeder
             Description = "Ability to optimize solutions for better time and space complexity.",
             IsRequired = true,
             MinimumThresholdScore = 75.00m,
-            IsActiveUntil = new DateTime(2024, 3, 15, 17, 0, 0)
+            IsActiveUntil = new DateTime(2024, 3, 15, 17, 0, 0, DateTimeKind.Utc)
         };
 
         var criteria4 = new EventStageCriteria
@@ -200,7 +200,7 @@ public static class DbSeeder
             Description = "Demonstration of innovative approaches and creative problem-solving.",
             IsRequired = true,
             MinimumThresholdScore = 80.00m,
-            IsActiveUntil = new DateTime(2024, 4, 20, 18, 0, 0)
+            IsActiveUntil = new DateTime(2024, 4, 20, 18, 0, 0, DateTimeKind.Utc)
         };
 
         context.EventStageCriterias.AddRange(criteria1, criteria2, criteria3, criteria4);
