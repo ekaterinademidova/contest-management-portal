@@ -1,0 +1,71 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (ContestService)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-contest-service",
+            "program": "${workspaceFolder}/src/Services/ContestService/ContestService.API/bin/Debug/net9.0/ContestService.API.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Services/ContestService/ContestService.API",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": ".NET Core Launch (SubmissionService)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-submission-service",
+            "program": "${workspaceFolder}/src/Services/SubmissionService/SubmissionService.API/bin/Debug/net9.0/SubmissionService.API.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Services/SubmissionService/SubmissionService.API",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": ".NET Core Launch (Both Services)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-all-services",
+            "program": "${workspaceFolder}/src/Services/ContestService/ContestService.API/bin/Debug/net9.0/ContestService.API.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/Services/ContestService/ContestService.API",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Launch Both Services",
+            "configurations": [
+                ".NET Core Launch (ContestService)",
+                ".NET Core Launch (SubmissionService)"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,84 @@
+### Submission Service API - HTTP Requests
+
+@baseUrl = https://localhost:7001
+@apiVersion = v1
+
+### Get all submissions
+GET {{baseUrl}}/api/submissions
+
+### Get submission by ID
+GET {{baseUrl}}/api/submissions/1
+
+### Get submissions by contest notice ID
+GET {{baseUrl}}/api/submissions?contestNoticeId=1
+
+### Get submissions by participant ID
+GET {{baseUrl}}/api/submissions?participantId=1
+
+### Get submissions by state
+GET {{baseUrl}}/api/submissions?submissionState=Pending
+
+### Create a new submission
+POST {{baseUrl}}/api/submissions
+Content-Type: application/json
+
+{
+  "contestNoticeId": 1,
+  "participantId": 1,
+  "coverLetter": "This is my submission for the contest.",
+  "comment": "Additional comments",
+  "docsPackageIsValid": true,
+  "submissionState": "Pending"
+}
+
+### Update a submission
+PUT {{baseUrl}}/api/submissions/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "contestNoticeId": 1,
+  "participantId": 1,
+  "coverLetter": "Updated cover letter",
+  "comment": "Updated comment",
+  "docsPackageIsValid": true,
+  "submissionState": "Approved"
+}
+
+### Delete a submission
+DELETE {{baseUrl}}/api/submissions/1
+
+### Get all appeals
+GET {{baseUrl}}/api/appeals
+
+### Get appeal by ID
+GET {{baseUrl}}/api/appeals/1
+
+### Get appeal by submission ID
+GET {{baseUrl}}/api/appeals/submission/1
+
+### Create a new appeal
+POST {{baseUrl}}/api/appeals
+Content-Type: application/json
+
+{
+  "submissionId": 1,
+  "coverLetter": "I would like to appeal the decision on my submission.",
+  "appealState": "Pending",
+  "comment": "Additional comments regarding the appeal"
+}
+
+### Update an appeal
+PUT {{baseUrl}}/api/appeals/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "submissionId": 1,
+  "coverLetter": "Updated appeal letter",
+  "appealState": "Considered",
+  "comment": "Updated comment"
+}
+
+### Delete an appeal
+DELETE {{baseUrl}}/api/appeals/1
