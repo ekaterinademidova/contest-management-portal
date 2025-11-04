@@ -74,6 +74,25 @@ Once the application is running, access Swagger UI at:
 - `PUT /api/ContestDocsPackages/{id}` - Update package
 - `DELETE /api/ContestDocsPackages/{id}` - Delete package
 
+---
+
+## SubmissionService API Endpoints
+
+### Submissions Controller
+- `GET /api/submissions` - Get all submissions (with optional filtering)
+- `GET /api/submissions/{id}` - Get submission by ID
+- `POST /api/submissions` - Create new submission
+- `PUT /api/submissions/{id}` - Update submission
+- `DELETE /api/submissions/{id}` - Delete submission
+
+### Appeals Controller
+- `GET /api/appeals` - Get all appeals
+- `GET /api/appeals/{id}` - Get appeal by ID
+- `GET /api/appeals/submission/{submissionId}` - Get appeal by submission ID
+- `POST /api/appeals` - Create new appeal
+- `PUT /api/appeals/{id}` - Update appeal
+- `DELETE /api/appeals/{id}` - Delete appeal
+
 ## Request Examples
 
 ### Create Event
@@ -99,6 +118,63 @@ PUT /api/Events/1
 ```
 GET /api/Events?name=Programming
 GET /api/Events?description=competition
+```
+
+### Create Submission
+```json
+POST /api/submissions
+{
+  "contestNoticeId": 1,
+  "participantId": 1,
+  "coverLetter": "This is my submission for the contest.",
+  "comment": "Additional comments",
+  "docsPackageIsValid": true,
+  "submissionState": "Pending"
+}
+```
+
+### Update Submission
+```json
+PUT /api/submissions/1
+{
+  "id": 1,
+  "contestNoticeId": 1,
+  "participantId": 1,
+  "coverLetter": "Updated cover letter",
+  "comment": "Updated comment",
+  "docsPackageIsValid": true,
+  "submissionState": "Approved"
+}
+```
+
+### Filter Submissions
+```
+GET /api/submissions?contestNoticeId=1
+GET /api/submissions?participantId=1
+GET /api/submissions?submissionState=Pending
+```
+
+### Create Appeal
+```json
+POST /api/appeals
+{
+  "submissionId": 1,
+  "coverLetter": "I would like to appeal the decision on my submission.",
+  "appealState": "Pending",
+  "comment": "Additional comments regarding the appeal"
+}
+```
+
+### Update Appeal
+```json
+PUT /api/appeals/1
+{
+  "id": 1,
+  "submissionId": 1,
+  "coverLetter": "Updated appeal letter",
+  "appealState": "Considered",
+  "comment": "Updated comment"
+}
 ```
 
 ## Response Examples

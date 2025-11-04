@@ -248,12 +248,12 @@ Use this checklist to track your progress through the implementation.
 
 ### Create Migration
 ```bash
-dotnet ef migrations add InitialCreate --project ContestService.Infrastructure --startup-project ContestService.API
+dotnet ef migrations add InitialCreate --project src/Services/ContestService/ContestService.Infrastructure --startup-project src/Services/ContestService/ContestService.API
 ```
 
 ### Update Database
 ```bash
-dotnet ef database update --project ContestService.Infrastructure --startup-project ContestService.API
+dotnet ef database update --project src/Services/ContestService/ContestService.Infrastructure --startup-project src/Services/ContestService/ContestService.API
 ```
 
 ### Run Tests
@@ -263,6 +263,6 @@ dotnet test
 
 ### Run API
 ```bash
-dotnet run --project ContestService.API
+dotnet run --project src/Services/ContestService/ContestService.API
 ```
 

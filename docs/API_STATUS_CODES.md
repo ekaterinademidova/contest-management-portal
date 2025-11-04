@@ -93,7 +93,9 @@ This document describes all HTTP status codes used in the Contest Management Por
 | GET (all) | 200 OK | - |
 | POST (create) | 201 Created | 400 Bad Request |
 | PUT (update) | 200 OK | 400 Bad Request, 404 Not Found |
-| DELETE | 204 No Content | 404 Not Found |
+| DELETE | 204 No Content | 404 Not Found, 400 Bad Request* |
+
+*400 Bad Request for DELETE: Used when trying to delete a Submission that has an associated Appeal (SubmissionService)
 
 ## Common Error Scenarios
 
@@ -109,6 +111,15 @@ This document describes all HTTP status codes used in the Contest Management Por
 
 ### ID Mismatch (400 Bad Request)
 - URL parameter `id` does not match `id` in request body during UPDATE operations
+
+### SubmissionService Specific Errors
+
+#### Cannot Delete Submission with Appeal (400 Bad Request)
+- Attempting to delete a Submission that has an associated Appeal
+- Must delete the Appeal first, then the Submission
+
+#### Appeal Already Exists (400 Bad Request)
+- Attempting to create a second Appeal for a Submission (1:1 relationship enforced)
 
 ## Best Practices
 

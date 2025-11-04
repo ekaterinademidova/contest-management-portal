@@ -40,11 +40,12 @@ This document outlines a comprehensive step-by-step implementation plan for the 
 ```
 ContestManagementPortal/
 ├── src/
-│   └── ContestService/
-│       ├── ContestService.API/              (Presentation)
-│       ├── ContestService.Application/      (Application)
-│       ├── ContestService.Domain/           (Domain)
-│       └── ContestService.Infrastructure/   (Infrastructure)
+│   └── Services/
+│       └── ContestService/
+│           ├── ContestService.API/              (Presentation)
+│           ├── ContestService.Application/      (Application)
+│           ├── ContestService.Domain/           (Domain)
+│           └── ContestService.Infrastructure/   (Infrastructure)
 └── tests/
     └── ContestService.Tests/
         ├── ContestService.UnitTests/
@@ -608,4 +609,280 @@ dotnet ef migrations add InitialCreate --project ContestService.Infrastructure -
 - Consider implementing API Gateway pattern later
 - Plan for eventual distributed transaction handling
 - Consider event-driven architecture for microservice communication
+
+---
+
+# SubmissionService Microservice - Implementation Plan
+
+## Overview
+This document outlines the implementation of the SubmissionService microservice following Clean Architecture principles, SOLID design patterns, REST API conventions, and modern .NET best practices. This microservice handles contest submissions and appeals.
+
+## Architecture Overview
+
+### Clean Architecture Layers
+```
+┌─────────────────────────────────────┐
+│   Presentation Layer (API)           │  ← Controllers, Middleware, Filters
+├─────────────────────────────────────┤
+│   Application Layer                  │  ← Use Cases, DTOs, Interfaces
+├─────────────────────────────────────┤
+│   Domain Layer                       │  ← Entities, Value Objects, Domain Events
+├─────────────────────────────────────┤
+│   Infrastructure Layer               │  ← EF Core, Repositories, External Services
+└─────────────────────────────────────┘
+```
+
+### Technology Stack
+- **.NET 9**
+- **ASP.NET Core Web API**
+- **Entity Framework Core 9** with PostgreSQL
+- **FluentValidation** (for validation)
+- **Swagger/OpenAPI** (API documentation)
+
+---
+
+## Project Structure
+
+### Solution Structure
+```
+ContestManagementPortal/
+├── src/
+│   └── Services/
+│       └── SubmissionService/
+│           ├── SubmissionService.API/              (Presentation)
+│           ├── SubmissionService.Application/      (Application)
+│           ├── SubmissionService.Domain/           (Domain)
+│           └── SubmissionService.Infrastructure/   (Infrastructure)
+```
+
+**Project References:**
+- API → Application → Domain
+- API → Infrastructure (only for DI registration)
+- Infrastructure → Application → Domain
+- Application → Domain (no other dependencies)
+
+---
+
+## Domain Layer (Core Business Logic)
+
+### Domain Entities
+
+#### Submission Entity
+**Location:** `SubmissionService.Domain/Entities/Submission.cs`
+
+**Properties:**
+- `Id` (int) - Primary key
+- `ContestNoticeId` (int) - Foreign key to ContestNotice (in ContestService)
+- `ParticipantId` (int) - Foreign key to User (in UserService)
+- `DateTime` (DateTime) - Submission timestamp
+- `CoverLetter` (string?) - Cover letter text
+- `Comment` (string?) - Additional comments
+- `DocsPackageIsValid` (bool?) - Document package validation status
+- `SubmissionState` (string?) - State: Pending, Approved, Rejected
+
+**Navigation Properties:**
+- `Appeal` - One-to-one relationship with Appeal
+
+#### Appeal Entity
+**Location:** `SubmissionService.Domain/Entities/Appeal.cs`
+
+**Properties:**
+- `Id` (int) - Primary key
+- `SubmissionId` (int) - Foreign key to Submission (1:1 relationship)
+- `DateTime` (DateTime) - Appeal timestamp
+- `CoverLetter` (string?) - Appeal cover letter
+- `AppealState` (string?) - State: Pending, Considered
+- `Comment` (string?) - Additional comments
+
+**Navigation Properties:**
+- `Submission` - One-to-one relationship with Submission
+
+### Domain Interfaces
+
+#### Repository Interfaces
+- `IRepository<T>` - Generic repository interface
+- `ISubmissionRepository` - Submission-specific repository
+- `IAppealRepository` - Appeal-specific repository
+
+---
+
+## Application Layer (Use Cases & Business Logic)
+
+### DTOs (Data Transfer Objects)
+
+#### Submission DTOs
+- `SubmissionDto` - Response DTO
+- `CreateSubmissionRequest` - Create request DTO
+- `UpdateSubmissionRequest` - Update request DTO
+- `SubmissionFilterRequest` - Filtering DTO
+
+#### Appeal DTOs
+- `AppealDto` - Response DTO
+- `CreateAppealRequest` - Create request DTO
+- `UpdateAppealRequest` - Update request DTO
+
+### Validators
+
+All DTOs have FluentValidation validators:
+- `CreateSubmissionRequestValidator`
+- `UpdateSubmissionRequestValidator`
+- `CreateAppealRequestValidator`
+- `UpdateAppealRequestValidator`
+
+### Services
+
+#### SubmissionService
+**Location:** `SubmissionService.Application/Services/SubmissionService.cs`
+
+**Methods:**
+- `GetSubmissionByIdAsync` - Get submission by ID
+- `GetAllSubmissionsAsync` - Get all submissions with optional filtering
+- `CreateSubmissionAsync` - Create new submission
+- `UpdateSubmissionAsync` - Update existing submission
+- `DeleteSubmissionAsync` - Delete submission (with appeal check)
+
+**Appeal Methods:**
+- `GetAppealByIdAsync` - Get appeal by ID
+- `GetAppealBySubmissionIdAsync` - Get appeal by submission ID
+- `GetAllAppealsAsync` - Get all appeals
+- `CreateAppealAsync` - Create new appeal (ensures 1:1 relationship)
+- `UpdateAppealAsync` - Update existing appeal
+- `DeleteAppealAsync` - Delete appeal
+
+**Business Logic:**
+- Automatic DateTime setting on creation
+- Default SubmissionState = "Pending" if not provided
+- Validation that Submission exists before creating Appeal
+- Enforcement of 1:1 relationship between Submission and Appeal
+- Prevention of deletion of Submission with associated Appeal
+
+---
+
+## Infrastructure Layer (Data Access & External Services)
+
+### DbContext Configuration
+
+**Location:** `SubmissionService.Infrastructure/Data/SubmissionDbContext.cs`
+
+**DbSets:**
+- `Submissions`
+- `Appeals`
+
+**Entity Configurations:**
+- Submission: Table "Submission", timestamp defaults, foreign key constraints
+- Appeal: Table "Appeal", 1:1 relationship with Submission, unique index on SubmissionId
+
+### Repository Implementations
+
+- `BaseRepository<T>` - Generic base repository with common CRUD operations
+- `SubmissionRepository` - Submission-specific repository with:
+  - `GetByContestNoticeIdAsync`
+  - `GetByParticipantIdAsync`
+- `AppealRepository` - Appeal-specific repository with:
+  - `GetBySubmissionIdAsync`
+
+---
+
+## Presentation Layer (API)
+
+### Controllers
+
+#### SubmissionsController
+**Location:** `SubmissionService.API/Controllers/SubmissionsController.cs`
+
+**Endpoints:**
+- `GET /api/submissions` - Get all submissions (with optional filtering)
+- `GET /api/submissions/{id}` - Get submission by ID
+- `POST /api/submissions` - Create new submission
+- `PUT /api/submissions/{id}` - Update submission
+- `DELETE /api/submissions/{id}` - Delete submission
+
+#### AppealsController
+**Location:** `SubmissionService.API/Controllers/AppealsController.cs`
+
+**Endpoints:**
+- `GET /api/appeals` - Get all appeals
+- `GET /api/appeals/{id}` - Get appeal by ID
+- `GET /api/appeals/submission/{submissionId}` - Get appeal by submission ID
+- `POST /api/appeals` - Create new appeal
+- `PUT /api/appeals/{id}` - Update appeal
+- `DELETE /api/appeals/{id}` - Delete appeal
+
+### Program.cs Configuration
+
+- Swagger/OpenAPI configuration
+- Dependency injection (Application and Infrastructure layers)
+- Database migration on startup
+- HTTPS redirection
+- Authorization setup
+
+---
+
+## Database Schema
+
+### Submission Table
+```sql
+CREATE TABLE Submission (
+    Id INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    ContestNoticeId INT NOT NULL,
+    ParticipantId INT NOT NULL,
+    DateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CoverLetter TEXT,
+    Comment TEXT,
+    DocsPackageIsValid BOOLEAN NULL,
+    SubmissionState VARCHAR(100),
+    CONSTRAINT FK_Submission_ContestNotice FOREIGN KEY (ContestNoticeId) REFERENCES ContestNotice(Id),
+    CONSTRAINT FK_Submission_User FOREIGN KEY (ParticipantId) REFERENCES "User"(Id)
+);
+```
+
+### Appeal Table
+```sql
+CREATE TABLE Appeal (
+    Id INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    SubmissionId INT NOT NULL,
+    DateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CoverLetter TEXT,
+    AppealState VARCHAR(100),
+    Comment TEXT,
+    CONSTRAINT FK_Appeal_Submission FOREIGN KEY (SubmissionId) REFERENCES Submission(Id),
+    CONSTRAINT UQ_Appeal_SubmissionId UNIQUE (SubmissionId)
+);
+```
+
+---
+
+## Key Features
+
+1. **Clean Architecture**: Proper separation of concerns across layers
+2. **Validation**: FluentValidation for all request DTOs
+3. **Swagger Documentation**: Complete API documentation with examples
+4. **Business Logic**:
+   - Automatic timestamp management
+   - State management (default values)
+   - Relationship enforcement (1:1 between Submission and Appeal)
+   - Referential integrity checks
+5. **Error Handling**: Proper HTTP status codes and error messages
+
+---
+
+## Implementation Status
+
+✅ **Completed:**
+- Domain layer (entities, interfaces)
+- Application layer (DTOs, validators, services)
+- Infrastructure layer (DbContext, repositories)
+- API layer (controllers, Program.cs)
+- Swagger configuration
+- Dependency injection setup
+
+---
+
+## Next Steps
+
+1. Database migrations
+2. Integration testing
+3. Performance optimization
+4. Additional validation rules
+5. Logging and monitoring
 
